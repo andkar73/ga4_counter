@@ -1,0 +1,6 @@
+name: GA4 counter
+type: module
+description: Gets data from Google Analytics 4 Data API and makes it accesseble for views.
+package: Custom
+core: 8.x
+core_version_requirement: ^8 || ^9

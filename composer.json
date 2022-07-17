@@ -1,0 +1,15 @@
+{
+    "name": "drupal/ga4_counter",
+    "description": "Gets data from Google Analytics 4 Data API and makes it accesseble for views.",
+    "type": "drupal-custom-module",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Andreas",
+            "email": "andkar73@gmail.com"
+        }
+    ],
+    "require": {
+        "google/analytics-data": "^0.8.4"
+    }
+}

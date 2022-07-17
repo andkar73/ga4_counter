@@ -1,0 +1,12 @@
+<?php
+
+/**
+ * Implements hook_cron().
+ */
+function ga4_counter_cron() {
+  $queryResponse = \Drupal::service('ga4_counter.queryservice')->request();
+  foreach ($queryResponse->getRows() as $row) {
+    print $row->getDimensionValues()[0]->getValue()
+      . ' ' . $row->getMetricValues()[0]->getValue() . PHP_EOL;
+  }
+}

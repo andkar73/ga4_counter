@@ -1,0 +1,112 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the ga4_counter module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function ga4_counter_install() {
+  \Drupal::messenger()->addStatus(__FUNCTION__);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function ga4_counter_uninstall() {
+  \Drupal::messenger()->addStatus(__FUNCTION__);
+}
+
+/**
+ * Implements hook_schema().
+ */
+function ga4_counter_schema() {
+
+  $schema['ga4_counter'] = [
+    'description' => 'Stores URIs and pageviews from Google Analytics.',
+    'fields' => [
+      'pagepath_hash' => [
+        'type' => 'varchar',
+        'length' => 32,
+        'description' => 'md5 hash of the relative page path.',
+        'not null' => TRUE,
+      ],
+      'pagepath' => [
+        'type' => 'varchar',
+        'length' => 2048,
+        'description' => 'Relative page path, for example "node/1" or "contact", as stored by GA.',
+        'not null' => TRUE,
+      ],
+      'pageviews' => [
+        'type' => 'int',
+        'size' => 'big',
+        'description' => 'Pageview count.',
+        'unsigned' => TRUE,
+        'default' => 0,
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => ['pagepath_hash'],
+    'indexes' => [
+      'pagepath' => [['pagepath', 20]],
+      'pageviews' => ['pageviews'],
+    ],
+  ];
+
+  $schema['ga4_nid_storage'] = [
+    'description' => 'Stores node ids for nodes only that have pageview totals.',
+    'fields' => [
+      'nid' => [
+        'description' => 'Node IDs',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'pageview_total' => [
+        'description' => 'Total pageview counts',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+    ],
+    'indexes' => [
+      'nid' => ['nid'],
+      'pageview_total' => ['pageview_total'],
+    ],
+  ];
+
+  $schema['ga4_tid_storage'] = [
+    'description' => 'Stores terms ids for terms that have pageview totals.',
+    'fields' => [
+      'tid' => [
+        'description' => 'Term IDs',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+      'pageview_total' => [
+        'description' => 'Total pageview counts',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ],
+    ],
+    'indexes' => [
+      'tid' => ['tid'],
+      'pageview_total' => ['pageview_total'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function ga4_counter_requirements($phase) {
+  $requirements = [];
+
+  return $requirements;
+}
