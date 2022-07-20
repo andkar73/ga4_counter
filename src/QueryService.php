@@ -14,8 +14,8 @@ class QueryService implements QueryServiceInterface {
    * {@inheritdoc}
    */
   public function request() {
-    $api_credentials_path = settings::get('ga_data_api_credentials');
-    $property_id = settings::get('ga_data_api_property_id');
+    $api_credentials_path = settings::get('ga4_data_api_credentials');
+    $property_id = settings::get('ga4_data_api_property_id');
 
     // Adds a variable to the server environment.
     putenv('GOOGLE_APPLICATION_CREDENTIALS='.$api_credentials_path);

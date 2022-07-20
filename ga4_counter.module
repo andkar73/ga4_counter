@@ -4,9 +4,21 @@
  * Implements hook_cron().
  */
 function ga4_counter_cron() {
-  $queryResponse = \Drupal::service('ga4_counter.queryservice')->request();
-  foreach ($queryResponse->getRows() as $row) {
-    print $row->getDimensionValues()[0]->getValue()
-      . ' ' . $row->getMetricValues()[0]->getValue() . PHP_EOL;
-  }
+  \Drupal::service('ga_counter.updateservice')->update_pathe_count();
+  \Drupal::service('ga_counter.updateservice')->update_page_views();
 }
+
+/**
+ * Implements hook_cron().
+ */
+//function so_ga_counter_cron() {
+//  // Invalidate the create and update list based on a cache tag.
+//  $state_key = 'updated_ga4_counter_cron';
+//  $last_cleared = \Drupal::state()->get($state_key);
+//  $today = date('Y-m-d');
+//  if ($last_cleared != $today) {
+//    \Drupal::state()->set($state_key, $today);
+//    get_all_ga_taxonommy();
+//    \Drupal::logger('so_ga_counter')->notice('so_ga_counter updated database');
+//  }
+//}

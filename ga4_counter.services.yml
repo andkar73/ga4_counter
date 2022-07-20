@@ -1,3 +1,7 @@
 services:
   ga4_counter.queryservice:
     class: Drupal\ga4_counter\QueryService
+
+  ga_counter.updateservice:
+    class: Drupal\ga4_counter\UpdateService
+    arguments: ['@database', '@ga4_counter.queryservice', '@path_alias.manager', '@path.matcher' ]
