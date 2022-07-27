@@ -3,7 +3,6 @@
 
 namespace Drupal\ga4_counter;
 
-
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Path\PathMatcherInterface;
@@ -86,8 +85,7 @@ class UpdateService implements UpdateServiceInterface {
       $path_alias  = $record->pagepath;
       $pageviews = $record->pageviews;
 
-      // Use dependency injection instead.
-      $system_path = \Drupal::service('path_alias.manager')->getPathByAlias($path_alias, 'sv');
+      $system_path = $this->alias_manager->getPathByAlias($path_alias, 'sv');
       $path_array = explode('/', $system_path);
       $type = $path_array[1];
       $nid = is_numeric($path_array[2]) ? $path_array[2] :  NULL;
@@ -95,6 +93,7 @@ class UpdateService implements UpdateServiceInterface {
 
       // Get a list of term-id:s (tid) to exclude from settings.php.
       $exclude_tid = empty(settings::get('ga4_exclude_tid')) ? [] : settings::get('ga4_exclude_tid');
+
 
       if ($type === 'node' && $nid !== null) {
         $this->update_ga4_tid_storage($nid, $pageviews, 'ga4_nid_storage', 'nid');
