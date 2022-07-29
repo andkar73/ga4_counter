@@ -51,6 +51,7 @@ class UpdateService implements UpdateServiceInterface {
    */
   public function update_pathe_count(): void {
     $queryResponse = $this->queryService->request();
+    $this->connection->truncate('ga4_counter');
     foreach ($queryResponse->getRows() as $row) {
       // Use only the first 2047 characters of the pagepath. This is extremely long
       // but Google does store everything and bots can make URIs that exceed that length.
@@ -76,6 +77,8 @@ class UpdateService implements UpdateServiceInterface {
    *
    */
   function update_page_views() {
+    $this->connection->truncate('ga4_nid_storage');
+    $this->connection->truncate('ga4_tid_storage');
     $query = $this->connection->select('ga4_counter', 'ga4');
     $query->fields('ga4', ['pagepath', 'pageviews']);
     $query->orderBy('pageviews', 'DESC');
