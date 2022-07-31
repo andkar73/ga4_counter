@@ -27,7 +27,7 @@ $ composer require google/analytics-data
 ```
 $settings['ga_data_api_credentials'] = '<path to your json file with Google application credentials>';
 $settings['ga_data_api_property_id'] = '<property id for your Google Analytics 4 account>';
-$settings['ga4_exclude_tid'] = <Array with number representing term id:s you want to exclude (ex. [9, 10, 17, 14,])>;
+$settings['ga4_exclude_tid'] = <Array with number representing term id:s you want to exclude (ex. [9, 10, 17, 14,]). This setting is optional>;
 ```
 * Enable the module as a regular Drupal module.
 
