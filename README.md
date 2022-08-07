@@ -32,11 +32,11 @@ $settings['ga4_exclude_tid'] = <Array with number representing term id:s you wan
 * Enable the module as a regular Drupal module.
 
 ## Architecture
-Once a day, with the cron job, the module fetches data containing a URL and an integer, representing the number of times the URL has been visited in the last seven days. The data is saved in the table ga4_counter.
+Once a day, with the cron job, the module fetches data, from Google analytics, containing a URL and an integer, representing the number of times the URL has been visited in the last seven days. The data is saved in the table ga4_counter.
 
 After the data is saved in the database the module determines if the URL is a node or a taxonomy term. If the URL represents a node the node id (nid) and page views are saved to a table named ga4_nid_storage. If the URL represents a taxonomy term the term id (td) and page views is saved to a table named ga4_tid_storage.
 
-Before data is fetched the three tables are truncated.
+Before data is fetched the three tables are truncated to avoid updates problems.
 
 This approach is tested on a site with approximately 10 000 nodes and taxonomy terms without any problem. If this module causes performance problems we can process the nodes in batches by using the Queue API.
 
