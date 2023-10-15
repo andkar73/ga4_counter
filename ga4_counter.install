@@ -110,3 +110,19 @@ function ga4_counter_requirements($phase) {
 
   return $requirements;
 }
+
+/**
+ * Add a primary key to ga4_nid_storage and ga4_tid_storage.
+ */
+function ga4_counter_update_10100() {
+  $connection = \Drupal::database();
+  $tables = ['ga4_tid_storage' => 'tid', 'ga4_nid_storage' => 'nid'];
+  $result = "The following tables got a primary key:";
+  foreach ($tables as $table => $primary_key) {
+    if ($connection->schema()->tableExists($table)) {
+      $connection->schema()->addPrimaryKey($table,[$primary_key]);
+      $result .= ' ' . $table;
+    }
+  }
+  return $result;
+}

@@ -22,6 +22,7 @@ function ga4_counter_views_data() {
   $data['ga4_tid_storage']['table']['base'] = [
     'field' => 'tid',
     'title' => t('GA4 Counter terms'),
+    'primary key' => ['tid'],
     'help' => t('GA4 Counter module table containing pageview counts for terms.'),
     'weight' => -10,
   ];
@@ -74,6 +75,7 @@ function ga4_counter_views_data() {
   $data['ga4_nid_storage']['table']['base'] = [
     'field' => 'nid',
     'title' => t('GA4 Counter node'),
+    'primary key' => ['nid'],
     'help' => t('GA4 Counter module table containing pageview counts for nodes.'),
     'weight' => -10,
   ];
