@@ -87,16 +87,25 @@ class UpdateService implements UpdateServiceInterface {
     foreach ($result as $record) {
       $path_alias  = $record->pagepath;
       $pageviews = $record->pageviews;
-
       $system_path = $this->alias_manager->getPathByAlias($path_alias, 'sv');
       $path_array = explode('/', $system_path);
-      $type = $path_array[1];
-      $nid = is_numeric($path_array[2]) ? $path_array[2] :  NULL;
-      $tid = is_numeric($path_array[3]) ? $path_array[3] :  NULL;
+      $type = NULL;
+      if (isset($path_array[1])) {
+        $type = $path_array[1];
+      }
+      $nid = NULL;
+      if (isset($path_array[2])) {
+        $nid = is_numeric($path_array[2]) ? $path_array[2] :  NULL;
+      }
+      $tid = NULL;
+
+      // I check $path_array[4] to remove path with /edit that destorys the statistics.
+      if (isset($path_array[3]) && !isset($path_array[4])) {
+        $tid = is_numeric($path_array[3]) ? $path_array[3] :  NULL;
+      }
 
       // Get a list of term-id:s (tid) to exclude from settings.php.
       $exclude_tid = empty(settings::get('ga4_exclude_tid')) ? [] : settings::get('ga4_exclude_tid');
-
 
       if ($type === 'node' && $nid !== null) {
         $this->update_ga4_tid_storage($nid, $pageviews, 'ga4_nid_storage', 'nid');
