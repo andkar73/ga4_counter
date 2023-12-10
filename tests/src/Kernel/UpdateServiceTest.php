@@ -54,19 +54,16 @@ class UpdateServiceTest extends KernelTestBase
   {
     parent::setUp();
 
+    $this->installSchema('ga4_counter', ['ga4_counter', 'ga4_nid_storage', 'ga4_tid_storage']);
 
+    // Create a prophecy for the RunReportResponse class.
     $runReportResponseProphecy = $this->prophesize(RunReportResponse::class);
     $runReportResponseProphecy->getRows()->willReturn($this->mockData);
     $runReportResponseMock = $runReportResponseProphecy->reveal();
 
     // Create a prophecy for the QueryService class.
     $queryServiceProphecy = $this->prophesize(QueryService::class);
-
-    //Define a prediction for the request method.
-    //$mockResponse = new FakeRunReportResponse($this->mockData);
-    //$mockResponse = new FakeRunReportResponse($this->mockData);
     $queryServiceProphecy->request()->willReturn($runReportResponseMock);
-    // Reveal the prophecy to get the actual mock object.
     $queryServiceMock = $queryServiceProphecy->reveal();
 
     // Instantiate the UpdateService with the mock object.
@@ -81,11 +78,24 @@ class UpdateServiceTest extends KernelTestBase
   /**
    * Tests the update method.
    */
-  public function testUpdate()
+  public function testUpdatePathCount()
   {
+    $this->updateService->update_path_count();
+    $database = \Drupal::database();
 
-    // Call the update method and check the result.
-    $this->updateService->update_page_views();
+    $queryCountRows = $database->query("SELECT COUNT(*) FROM {ga4_counter}");
+    $count = $queryCountRows->fetchField();
+    $this->assertEquals(
+      count($this->mockData),
+      $count,
+      "The count of rows in the pagepath table is not equal to 5."
+    );
+
+//    $database->select('ga4_counter', 'ga4c')
+//      ->fields('ga4c', 'pageviews')
+//      ->condition('ga4c.page_path', '/information')
+//      ->execute()->fetch();
+
 
   }
 

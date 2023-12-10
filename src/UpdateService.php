@@ -63,7 +63,7 @@ class UpdateService implements UpdateServiceInterface {
    *
    * @throws \Exception
    */
-  public function update_pathe_count(): void {
+  public function update_path_count(): void {
     $queryResponse = $this->queryService->request();
     $this->truncateDatabaseTable('ga4_counter');
     foreach ($queryResponse->getRows() as $row) {
@@ -155,7 +155,7 @@ class UpdateService implements UpdateServiceInterface {
    * @return void
    */
   public function truncateDatabaseTable(string $table): void {
-    $this->connection->truncate($table)->execute();;
+    $this->connection->truncate($table)->execute();
   }
 
   /**
@@ -172,7 +172,6 @@ class UpdateService implements UpdateServiceInterface {
    */
   public function getPagePath(mixed $row): string
   {
-    echo get_class($row->getDimensionValues()[0]);
     return $row->getDimensionValues()[0]->getValue();
   }
 
