@@ -7,13 +7,19 @@ use Google\Analytics\Data\V1beta\BetaAnalyticsDataClient;
 use Google\Analytics\Data\V1beta\DateRange;
 use Google\Analytics\Data\V1beta\Dimension;
 use Google\Analytics\Data\V1beta\Metric;
+use Google\Analytics\Data\V1beta\RunReportResponse;
+use Google\ApiCore\ApiException;
 
+/**
+ *
+ */
 class QueryService implements QueryServiceInterface {
 
   /**
    * {@inheritdoc}
+   * @throws ApiException
    */
-  public function request() {
+  public function request(): RunReportResponse {
     $api_credentials_path = settings::get('ga4_data_api_credentials');
     $property_id = settings::get('ga4_data_api_property_id');
 
@@ -46,14 +52,10 @@ class QueryService implements QueryServiceInterface {
           'name' => 'screenPageViews',
         ]
       )
-      ]
+      ],
+      'limit' => 2
     ]);
-
-    // Print results of an API call.
-    $result =  'Report result: ' . PHP_EOL;
 
     return $response;
   }
-
-
 }

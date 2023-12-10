@@ -1,14 +1,20 @@
 <?php
 
-
 namespace Drupal\ga4_counter;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\path_alias\AliasManagerInterface;
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Site\Settings;
+use Drupal\Component\Utility\Html;
+
+/**
+ * Class UpdateService.
+ * The class is used to update the table ga4_counter with data from Google Analytics 4.
+ * @package Drupal\ga4_counter
+ *
+ */
 
 class UpdateService implements UpdateServiceInterface {
   use LoggerChannelTrait;
@@ -26,36 +32,45 @@ class UpdateService implements UpdateServiceInterface {
   /**
    * @var \Drupal\path_alias\AliasManagerInterface
    */
-  protected $alias_manager;
+  protected $aliasManager;
 
   /**
    * @var \Drupal\Core\Path\PathMatcherInterface
    */
-  protected $path_matcher;
+  protected $pathMatcher;
 
+  /**
+   * UpdateService constructor.
+   *
+   * @param \Drupal\Core\Database\Connection $connection The database connection.
+   * @param \Drupal\ga4_counter\QueryServiceInterface $queryService The query service.
+   * @param \Drupal\path_alias\AliasManagerInterface $aliasManager The alias manager.
+   * @param \Drupal\Core\Path\PathMatcherInterface $pathMatcher The path matcher.
+   */
   public function __construct(Connection $connection,
                               QueryServiceInterface $queryService,
-                              AliasManagerInterface $alias_manager,
-                              PathMatcherInterface $path_matcher) {
+                              AliasManagerInterface $aliasManager,
+                              PathMatcherInterface $pathMatcher) {
     $this->queryService = $queryService;
     $this->connection = $connection;
-    $this->alias_manager = $alias_manager;
-    $this->path_matcher = $path_matcher;
+    $this->aliasManager = $aliasManager;
+    $this->pathMatcher = $pathMatcher;
   }
 
   /**
-   * Fetch data (path and page views) from Google analytics 4 and update the table
+   * Fetch data (path and page views) from Google Analytics 4 and update the table
    * ga4_counter.
    *
    * @throws \Exception
    */
   public function update_pathe_count(): void {
     $queryResponse = $this->queryService->request();
-    $this->connection->truncate('ga4_counter');
+    $this->truncateDatabaseTable('ga4_counter');
     foreach ($queryResponse->getRows() as $row) {
       // Use only the first 2047 characters of the pagepath. This is extremely long
       // but Google does store everything and bots can make URIs that exceed that length.
-      $page_path = $row->getDimensionValues()[0]->getValue();
+      $page_path = $this->getPagePath($row);
+
       $page_path_md5 = md5(Html::escape($page_path));
 
       $page_path_string = (strlen($page_path) > 2047) ? substr($page_path,0,2047) : $page_path;
@@ -65,7 +80,7 @@ class UpdateService implements UpdateServiceInterface {
         ->key('pagepath_hash', md5($page_path))
         ->fields([
           'pagepath' => $page_path_string,
-          'pageviews' => (int) $row->getMetricValues()[0]->getValue(),
+          'pageviews' => $this->getNumberOfPageViews($row),
         ])
         ->execute();
     }
@@ -74,11 +89,10 @@ class UpdateService implements UpdateServiceInterface {
   /**
    * Gets get node id (nid) and terms id (tid) from the table ga4_counter
    * and stores it in the table
-   *
    */
-  function update_page_views() {
-    $this->connection->truncate('ga4_nid_storage');
-    $this->connection->truncate('ga4_tid_storage');
+  public function update_page_views(): void {
+    $this->truncateDatabaseTable('ga4_nid_storage');
+    $this->truncateDatabaseTable('ga4_tid_storage');
     $query = $this->connection->select('ga4_counter', 'ga4');
     $query->fields('ga4', ['pagepath', 'pageviews']);
     $query->orderBy('pageviews', 'DESC');
@@ -87,7 +101,7 @@ class UpdateService implements UpdateServiceInterface {
     foreach ($result as $record) {
       $path_alias  = $record->pagepath;
       $pageviews = $record->pageviews;
-      $system_path = $this->alias_manager->getPathByAlias($path_alias, 'sv');
+      $system_path = $this->aliasManager->getPathByAlias($path_alias, 'sv');
       $path_array = explode('/', $system_path);
       $type = NULL;
       if (isset($path_array[1])) {
@@ -99,7 +113,7 @@ class UpdateService implements UpdateServiceInterface {
       }
       $tid = NULL;
 
-      // I check $path_array[4] to remove path with /edit that destorys the statistics.
+      // I check $path_array[4] to remove path with /edit that destroys the statistics.
       if (isset($path_array[3]) && !isset($path_array[4])) {
         $tid = is_numeric($path_array[3]) ? $path_array[3] :  NULL;
       }
@@ -121,18 +135,45 @@ class UpdateService implements UpdateServiceInterface {
    * Update the table ga4_tid_storage with term id:s (tid) or
    * ga4_nid_storage with term id:s (tid)
    *
-   * @param $id
-   * @param $pageviews
-   * number of page views
-   * @param $table
-   * @param $key_id
+   * @param int $id
+   * @param int $pageViews
+   * @param string $table
+   * @param string $key_id
    */
-  function update_ga4_tid_storage($id, $pageviews, $table, $key_id) {
+  public function update_ga4_tid_storage(int $id, int $pageViews, string $table, string $key_id): void {
     $this->connection->merge($table)
       ->key($key_id, $id)
       ->fields([
-        'pageview_total' => $pageviews,
+        'pageview_total' => $pageViews,
       ])
       ->execute();
   }
+
+  /**
+   * Truncate values in the table ga4_counter.
+   * @param string $table
+   * @return void
+   */
+  public function truncateDatabaseTable(string $table): void {
+    $this->connection->truncate($table)->execute();;
+  }
+
+  /**
+   * @param mixed $row
+   * @return int
+   */
+  public function getNumberOfPageViews(mixed $row): int {
+    return (int)$row->getMetricValues()[0]->getValue();
+  }
+
+  /**
+   * @param mixed $row
+   * @return string
+   */
+  public function getPagePath(mixed $row): string
+  {
+    echo get_class($row->getDimensionValues()[0]);
+    return $row->getDimensionValues()[0]->getValue();
+  }
+
 }
