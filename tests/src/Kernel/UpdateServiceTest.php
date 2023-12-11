@@ -2,7 +2,6 @@
 
 namespace Drupal\Tests\ga4_counter\Kernel;
 
-use Drupal\ga4_counter\FakeRunReportResponse;
 use Drupal\ga4_counter\QueryService;
 use Drupal\ga4_counter\UpdateService;
 use Drupal\KernelTests\KernelTestBase;
@@ -49,37 +48,22 @@ class UpdateServiceTest extends KernelTestBase
   /**
    * {@inheritdoc}
    * @throws ApiException
+   * @throws \Exception
    */
   protected function setUp(): void
   {
     parent::setUp();
 
     $this->installSchema('ga4_counter', ['ga4_counter', 'ga4_nid_storage', 'ga4_tid_storage']);
+    $queryServiceMock = $this->createMockForTheQueryServiceClass();
+    $this->instantiateTheUpdateServiceWithTheMockObject($queryServiceMock);
 
-    // Create a prophecy for the RunReportResponse class.
-    $runReportResponseProphecy = $this->prophesize(RunReportResponse::class);
-    $runReportResponseProphecy->getRows()->willReturn($this->mockData);
-    $runReportResponseMock = $runReportResponseProphecy->reveal();
-
-    // Create a prophecy for the QueryService class.
-    $queryServiceProphecy = $this->prophesize(QueryService::class);
-    $queryServiceProphecy->request()->willReturn($runReportResponseMock);
-    $queryServiceMock = $queryServiceProphecy->reveal();
-
-    // Instantiate the UpdateService with the mock object.
-    $this->updateService = new FakeUpdateService(
-      $this->container->get('database'),
-      $queryServiceMock,
-      $this->container->get('path_alias.manager'),
-      $this->container->get('path.matcher')
-    );
   }
 
   /**
    * Tests the update method.
    */
-  public function testUpdatePathCount()
-  {
+  public function testUpdatePathCount() {
     $this->updateService->update_path_count();
     $database = \Drupal::database();
 
@@ -91,12 +75,48 @@ class UpdateServiceTest extends KernelTestBase
       "The count of rows in the pagepath table is not equal to 5."
     );
 
-//    $database->select('ga4_counter', 'ga4c')
-//      ->fields('ga4c', 'pageviews')
-//      ->condition('ga4c.page_path', '/information')
-//      ->execute()->fetch();
+    $pageViews = $database->select('ga4_counter', 'ga4c')
+      ->fields('ga4c', ['pageviews'])
+      ->condition('ga4c.pagepath', '/information')
+      ->execute()->fetchField();
+    $this->assertEquals(
+      600,
+      $pageViews,
+      "The count of rows in the pagepath table is not equal to 5."
+    );
+  }
 
+  /**
+   * @return object
+   * @throws ApiException
+   */
+  public function createMockForTheQueryServiceClass(): object {
+    // Create a prophecy for the RunReportResponse class.
+    $runReportResponseProphecy = $this->prophesize(RunReportResponse::class);
+    $runReportResponseProphecy->getRows()->willReturn($this->mockData);
+    $runReportResponseMock = $runReportResponseProphecy->reveal();
 
+    // Create a prophecy for the QueryService class.
+    $queryServiceProphecy = $this->prophesize(QueryService::class);
+    $queryServiceProphecy->request()->willReturn($runReportResponseMock);
+
+    return  $queryServiceProphecy->reveal();
+  }
+
+  /**
+   * Instantiate the variable updateService with the mock object.
+   *
+   * @param object $queryServiceMock
+   * @return void
+   * @throws \Exception
+   */
+  public function instantiateTheUpdateServiceWithTheMockObject(object $queryServiceMock): void {
+    $this->updateService = new FakeUpdateService(
+      $this->container->get('database'),
+      $queryServiceMock,
+      $this->container->get('path_alias.manager'),
+      $this->container->get('path.matcher')
+    );
   }
 
 }
