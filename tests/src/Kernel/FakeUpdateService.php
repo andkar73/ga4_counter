@@ -2,11 +2,7 @@
 
 namespace Drupal\Tests\ga4_counter\Kernel;
 
-use Drupal\Core\Database\Connection;
-use Drupal\Core\Path\PathMatcherInterface;
-use Drupal\ga4_counter\QueryServiceInterface;
 use Drupal\ga4_counter\UpdateService;
-use Drupal\path_alias\AliasManagerInterface;
 
 /**
  * Class UpdateService.
