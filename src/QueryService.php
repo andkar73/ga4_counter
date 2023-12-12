@@ -8,23 +8,28 @@ use Google\Analytics\Data\V1beta\DateRange;
 use Google\Analytics\Data\V1beta\Dimension;
 use Google\Analytics\Data\V1beta\Metric;
 use Google\Analytics\Data\V1beta\RunReportResponse;
-use Google\ApiCore\ApiException;
 
 /**
+ * Query to Google analytics 4.
  *
+ * The class do a query to Google analytics 4 and fetches statistics over how
+ * many page views they have had over a 7 days period.
+ *
+ * @package Drupal\ga4_counter
  */
 class QueryService implements QueryServiceInterface {
 
   /**
    * {@inheritdoc}
-   * @throws ApiException
+   *
+   * @throws \Google\ApiCore\ApiException
    */
   public function request(): RunReportResponse {
     $api_credentials_path = settings::get('ga4_data_api_credentials');
     $property_id = settings::get('ga4_data_api_property_id');
 
     // Adds a variable to the server environment.
-    putenv('GOOGLE_APPLICATION_CREDENTIALS='.$api_credentials_path);
+    putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $api_credentials_path);
 
     // Using a default constructor instructs the client to use the credentials
     // specified in GOOGLE_APPLICATION_CREDENTIALS environment variable.
@@ -45,17 +50,18 @@ class QueryService implements QueryServiceInterface {
         [
           'name' => 'pagePath',
         ]
-      ),
+        ),
       ],
       'metrics' => [new Metric(
         [
           'name' => 'screenPageViews',
         ]
-      )
+        ),
       ],
-      'limit' => 2
+      'limit' => 2,
     ]);
 
     return $response;
   }
+
 }

@@ -6,16 +6,13 @@ use Drupal\ga4_counter\QueryService;
 use Drupal\ga4_counter\UpdateService;
 use Drupal\KernelTests\KernelTestBase;
 use Google\Analytics\Data\V1beta\RunReportResponse;
-use Google\ApiCore\ApiException;
-
 
 /**
  * Tests the UpdateService class.
  *
  * @group ga4_counter
  */
-class UpdateServiceTest extends KernelTestBase
-{
+class UpdateServiceTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
@@ -23,19 +20,20 @@ class UpdateServiceTest extends KernelTestBase
   protected static $modules = [
     'ga4_counter',
     'path',
-    'path_alias'
+    'path_alias',
   ];
 
   /**
    * The UpdateService under test.
    *
-   * @var UpdateService
+   * @var \Drupal\ga4_counter\UpdateService
    */
   protected UpdateService $updateService;
 
   /**
-   * @var array
    * Mock data for the class 'FakeRunReportResponse'.
+   *
+   * @var array
    */
   protected array $mockData = [
     ['page_path' => '/search', 'page_views' => 6000],
@@ -47,11 +45,11 @@ class UpdateServiceTest extends KernelTestBase
 
   /**
    * {@inheritdoc}
-   * @throws ApiException
+   *
+   * @throws \Google\ApiCore\ApiException
    * @throws \Exception
    */
-  protected function setUp(): void
-  {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->installSchema('ga4_counter', ['ga4_counter', 'ga4_nid_storage', 'ga4_tid_storage']);
@@ -87,8 +85,12 @@ class UpdateServiceTest extends KernelTestBase
   }
 
   /**
+   * Tests the update_page_views method.
+   *
    * @return object
-   * @throws ApiException
+   *   The mock object.
+   *
+   * @throws \Google\ApiCore\ApiException
    */
   public function createMockForTheQueryServiceClass(): object {
     // Create a prophecy for the RunReportResponse class.
@@ -100,14 +102,18 @@ class UpdateServiceTest extends KernelTestBase
     $queryServiceProphecy = $this->prophesize(QueryService::class);
     $queryServiceProphecy->request()->willReturn($runReportResponseMock);
 
-    return  $queryServiceProphecy->reveal();
+    return $queryServiceProphecy->reveal();
   }
 
   /**
    * Instantiate the variable updateService with the mock object.
    *
    * @param object $queryServiceMock
+   *   The mock object QueryService.
+   *
    * @return void
+   *   NO return value.
+   *
    * @throws \Exception
    */
   public function instantiateTheUpdateServiceWithTheMockObject(object $queryServiceMock): void {
