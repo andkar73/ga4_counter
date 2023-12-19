@@ -89,6 +89,8 @@ class UpdateService implements UpdateServiceInterface {
   /**
    * Gets get node id (nid) and terms id (tid) from the table ga4_counter
    * and stores it in the table
+   *
+   * @TDO 'langcode' needs to be a setting.
    */
   public function update_page_views(): void {
     $this->truncateDatabaseTable('ga4_nid_storage');

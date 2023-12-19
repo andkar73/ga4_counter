@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ * Contains ga4_counter.module.
+ */
 
 /**
  * Implements hook_cron().
