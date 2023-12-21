@@ -69,7 +69,7 @@ class UpdateServiceTest extends EntityKernelTestBase {
 
     foreach ($this->mockData['node'] as $row) {
       $node = $this->createNode($row['title'], $row['page_path']);
-      $this->createPathAlias('/node/' . $node->id(), $row['page_path'], 'sv');
+      $this->createPathAlias('/node/' . $node->id(), $row['page_path']);
     }
 
     foreach ($this->mockData['term'] as $row) {
@@ -78,7 +78,7 @@ class UpdateServiceTest extends EntityKernelTestBase {
         'vid' => 'tags',
       ]);
       $term->save();
-      $this->createPathAlias('/taxonomy/term/' . $term->id(), $row['page_path'], 'sv');
+      $this->createPathAlias('/taxonomy/term/' . $term->id(), $row['page_path']);
 
       $this->addTaxonomyEditToMockSata($term->id());
     }
@@ -114,7 +114,7 @@ class UpdateServiceTest extends EntityKernelTestBase {
    * Tests the method update_path_count.
    */
   private function updatePageCounterTests(): void {
-    $this->updateService->update_path_count();
+    $this->updateService->updatePathCount();
 
     $database = \Drupal::database();
 
@@ -155,7 +155,7 @@ class UpdateServiceTest extends EntityKernelTestBase {
    * Tests the method update_page_views.
    */
   private function updatePageViewsTests() {
-    $this->updateService->update_page_views();
+    $this->updateService->updatePageViews();
 
     $database = \Drupal::database();
     $queryCountRows = $database->query("SELECT COUNT(*) FROM {ga4_nid_storage}");
@@ -176,7 +176,7 @@ class UpdateServiceTest extends EntityKernelTestBase {
       "The count of rows in the tid table is not equal to {$numberOfNods}."
     );
 
-    $system_path = \Drupal::service('path_alias.manager')->getPathByAlias($this->mockData['term'][0]['page_path'], 'sv');
+    $system_path = \Drupal::service('path_alias.manager')->getPathByAlias($this->mockData['term'][0]['page_path']);
     $path_array = explode('/', $system_path);
     $term = $database->select('ga4_tid_storage', 'ga4t')
       ->fields('ga4t', ['pageview_total'])
@@ -249,10 +249,8 @@ class UpdateServiceTest extends EntityKernelTestBase {
     $node = Node::create([
       'type' => 'page',
       'title' => $title,
-      'langcode' => 'sv',
       'path' => [
         'alias' => $page_path,
-        'langcode' => 'sv',
       ],
     ]);
     $node->save();
@@ -266,18 +264,15 @@ class UpdateServiceTest extends EntityKernelTestBase {
    *   The path.
    * @param string $alias
    *   The alias.
-   * @param string $langcode
-   *   The language code.
    *
    * @return \Drupal\Core\Entity\EntityInterface
    *   The created path alias entity.
    */
-  protected function createPathAlias(string $path, string $alias, string $langcode = LanguageInterface::LANGCODE_NOT_SPECIFIED): EntityInterface {
+  protected function createPathAlias(string $path, string $alias): EntityInterface {
     /** @var \Drupal\path_alias\PathAliasInterface $path_alias */
     $path_alias = \Drupal::entityTypeManager()->getStorage('path_alias')->create([
       'path' => $path,
       'alias' => $alias,
-      'langcode' => $langcode,
     ]);
     $path_alias->save();
 

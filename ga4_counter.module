@@ -10,13 +10,13 @@
  */
 function ga4_counter_cron() {
   // Invalidate the create and update list based on a cache tag.
-  $state_key = 'updated_ga4_counter_cron';
-  $last_cleared = \Drupal::state()->get($state_key);
+  $stateKey = 'updated_ga4_counter_cron';
+  $lastCleared = \Drupal::state()->get($stateKey);
   $today = date('Y-m-d');
-  if ($last_cleared != $today) {
-    \Drupal::state()->set($state_key, $today);
-    \Drupal::service('ga_counter.updateservice')->update_pathe_count();
-    \Drupal::service('ga_counter.updateservice')->update_page_views();
+  if ($lastCleared != $today) {
+    \Drupal::state()->set($stateKey, $today);
+    \Drupal::service('ga_counter.update_service')->updatePathCount();
+    \Drupal::service('ga_counter.update_service')->updatePageViews();
     \Drupal::logger('ga4_counter')->notice('ga4_counter gets new data and updates database');
   }
 }

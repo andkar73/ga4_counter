@@ -25,24 +25,24 @@ class QueryService implements QueryServiceInterface {
    * @throws \Google\ApiCore\ApiException
    */
   public function request(): RunReportResponse {
-    $api_credentials_path = settings::get('ga4_data_api_credentials');
-    $property_id = settings::get('ga4_data_api_property_id');
+    $apiCredentialsPath = settings::get('ga4_data_api_credentials');
+    $propertyId = settings::get('ga4_data_api_property_id');
 
     // Adds a variable to the server environment.
-    putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $api_credentials_path);
+    putenv('GOOGLE_APPLICATION_CREDENTIALS=' . $apiCredentialsPath);
 
     // Using a default constructor instructs the client to use the credentials
     // specified in GOOGLE_APPLICATION_CREDENTIALS environment variable.
     $client = new BetaAnalyticsDataClient();
 
-    $start_date = date('Y-m-d', strtotime("-7 day"));
+    $startDate = date('Y-m-d', strtotime("-7 day"));
 
     // Make an API call to the Data API.
     $response = $client->runReport([
-      'property' => 'properties/' . $property_id,
+      'property' => 'properties/' . $propertyId,
       'dateRanges' => [
         new DateRange([
-          'start_date' => $start_date,
+          'start_date' => $startDate,
           'end_date' => 'today',
         ]),
       ],
@@ -58,7 +58,6 @@ class QueryService implements QueryServiceInterface {
         ]
         ),
       ],
-      'limit' => 2,
     ]);
 
     return $response;
