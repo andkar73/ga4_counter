@@ -3,13 +3,13 @@ GA4 Counter
 
 This Drupal module is a very specialized module that uses the ‘Data API’ for ‘Google Analytics 4’. The module fetches data about the number of page views for nodes and terms for the last seven days. The data is exposed in Views and can be used when showing content (nodes) or taxonomy terms.
 
-The modules ‘Google Analytics Counter’ (https://www.drupal.org/project/google_analytics_counter ) can replace this module, when it gets support for Google Analytics 4, if you do not need to support taxonomy terms.
+The modules ‘Google Analytics Counter’ (https://www.drupal.org/project/google_analytics_counter ) can replace this module, if you do not need to support taxonomy terms.
 
 ## Data API credentials
 To use this module you need to create a service account for GA4 on
 https://console.cloud.google.com/welcome
 
-Download the json file with Google application credentials. 
+Download the json file with Google application credentials.
 Read more about this process in the google documentation https://developers.google.com/analytics/devguides/reporting/data/v1.
 
 ## Installation
@@ -38,5 +38,7 @@ After the data is saved in the database the module determines if the URL is a no
 
 Before data is fetched the three tables are truncated to avoid updates problems.
 
-This approach is tested on a site with approximately 10 000 nodes and taxonomy terms without any problem. If this module causes performance problems we can process the nodes in batches by using the Queue API.
+This approach is tested on a site with approximately 10 000 nodes and taxonomy terms without any problem.
+
+If you experience a problem with this module please let me know by creating an issue.
 
