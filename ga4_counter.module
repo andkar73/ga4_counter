@@ -13,7 +13,10 @@ function ga4_counter_cron() {
   $stateKey = 'updated_ga4_counter_cron';
   $lastCleared = \Drupal::state()->get($stateKey);
   $today = date('Y-m-d');
-  if ($lastCleared != $today) {
+  $timeHour = (int) date('H');
+  // Cron runs every four hours, and I want it to run at 0:00 4:00 8:00.
+  // We need to run three times because update problems with Google Analytics API. Can be cause time difference?
+  if ($lastCleared != $today or $timeHour < 9) {
     \Drupal::state()->set($stateKey, $today);
     \Drupal::service('ga_counter.update_service')->updatePathCount();
     \Drupal::service('ga_counter.update_service')->updatePageViews();
